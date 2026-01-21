@@ -4,14 +4,16 @@
 #include <string>
 
 
-enum FormType 
-{ 
+using f_instrEmitter = void(*)(int, const std::string&);
+
+enum FormType
+{
 	FORM_UNK,
 	FORM_PADDING,
-	FORM_I, 
-	FORM_B, 
-	FORM_SC, 
-	FORM_D, 
+	FORM_I,
+	FORM_B,
+	FORM_SC,
+	FORM_D,
 	FORM_DS,
 	FORM_X,
 	FORM_XO,
@@ -19,6 +21,9 @@ enum FormType
 	FORM_XFX,
 	FORM_M,
 	FORM_MD,
+	FORM_XS,
+	FORM_XFL,
+	FORM_VX,
 };
 
 
@@ -28,10 +33,16 @@ union DEFAULTForm
 	struct { uint32_t CCC : 26, OPCD : 6; };
 };
 
+union VXForm
+{
+	uint32_t raw;
+	struct { uint32_t XO : 11, vB : 5, vA : 5, vD : 5, OPCD : 6; };
+};
+
 union IForm
 {
 	uint32_t raw;
-	uint32_t LK : 1, AA : 1, LI : 24, OPCD : 6;
+	struct { uint32_t LK : 1, AA : 1, LI : 24, OPCD : 6; };
 };
 
 union BForm 
@@ -99,6 +110,17 @@ union XLForm
 	struct { uint32_t LK : 1, XO : 10, ZERO5 : 5, BI : 5, BO : 5, OPCD : 6; } XL_1;
 };
 
+union XFLForm
+{
+	uint32_t raw;
+	struct { uint32_t Rc : 1, XO : 10, B : 5, ZERO1 : 1, FM : 8, ZERO : 1, OPCD : 6; } XFL;
+};
+
+union XSForm
+{
+	uint32_t raw;
+	struct { uint32_t Rc : 1, sh1 : 1, XO : 9, sh : 5, A : 5, S : 5, OPCD : 6; } XS;
+};
 
 union XFXForm
 {
@@ -122,6 +144,9 @@ union InstrOperands
 	XLForm XL;
 	XFXForm XFX;
 	MForm M;
+	XSForm XS;
+	XFLForm XFL;
+	VXForm VX;
 };
 
 
@@ -130,6 +155,7 @@ struct InstructionDescriptor
 {
 	std::string mnemonic;
 	FormType m_Type;
+	f_instrEmitter emitter;
 };
 
 struct Instruction
@@ -146,6 +172,8 @@ struct Instruction
 
 	Instruction() {}
 };
+
+static InstructionDescriptor unknownDesc = { "UNK", FormType::FORM_UNK, nullptr };
 
 // responsible of indexing opcodes and (if any) extended opcodes
 // also responsible of decoding an instruction 
@@ -173,12 +201,20 @@ struct InstructionRegistry
 		
 		// get OpcodeKey by main Opcode
 		auto it = m_mainOPs.find(operands.DEF.OPCD);
-		if (it == m_mainOPs.end()) { printf("Instruction::DecodeInstr %s : %d", "MAIN OPCODE HAS NO KEY", operands.DEF.OPCD); _CrtDbgBreak(); }
+		if (it == m_mainOPs.end()) 
+		{ 
+			printf("Instruction::DecodeInstr MAIN OPCODE HAS NO KEY : %d\n", operands.DEF.OPCD);
+			return makeUnkInstr(data, address);
+		}
 		
 		OpcodeKey& key = it->second;
 		uint32_t extOpcode = (data & key.m_extMASK);
 		auto itDesc = key.m_descriptors.find(extOpcode);
-		if (itDesc == key.m_descriptors.end()) { printf("Instruction::DecodeInstr %s %d", "OpCodeKey HAS NO DESCRIPTOR FOR THIS EXTOP", extOpcode >> (__builtin_ctz(key.m_extMASK))); _CrtDbgBreak(); }
+		if (itDesc == key.m_descriptors.end()) 
+		{ 
+			printf("Instruction::DecodeInstr OpCodeKey HAS NO DESCRIPTOR FOR THIS EXTOP %d\n", extOpcode >> (__builtin_ctz(key.m_extMASK))); 
+			return makeUnkInstr(data, address);
+		}
 		
 		InstructionDescriptor& desc = itDesc->second;
 		instr.address = address;
@@ -186,19 +222,16 @@ struct InstructionRegistry
 		instr.m_rawData = data;
 		return instr;
 	}
+
+	static Instruction makeUnkInstr(uint32_t data, uint32_t address){
+		Instruction instr;
+		instr.address = address;
+		instr.m_rawData = data;
+		instr.desc = unknownDesc;
+		return instr;
+	}
 };
 
 
 
 extern InstructionRegistry g_instrRegistry;
-
-//class InstructionDecoder {
-//public:
-//  InstructionDecoder(XLoader::Section* imageSection, const uint8_t* secDataPtr, uint32_t secBaseAddr);
-//  uint32_t GetInstructionAt(uint32_t address, Instruction &instruction);
-//  uint32_t DecodeInstruction(const uint8_t *stride, Instruction &instruction);
-//
-//  uint64_t m_imageBaseAddress;
-//  uint64_t m_imageDataSize;
-//  const uint8_t *m_imageDataPtr;
-//};

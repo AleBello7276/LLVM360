@@ -20,12 +20,13 @@ set(DECODER
 )
 
 set(IR
-    src/IR/Unit/UnitTesting.h
-    src/IR/InstructionEmitter.h
-    src/IR/IRFunc.cpp
-    src/IR/IRFunc.h
-    src/IR/IRGenerator.cpp
-    src/IR/IRGenerator.h
+    src/IR/IRGen.h
+    src/IR/IRGen.cpp
+
+    #src/IR/IRFunc.cpp
+    #src/IR/IRFunc.h
+    #src/IR/IRGenerator.cpp
+    #src/IR/IRGenerator.h
 )
 
 set(SRC
@@ -36,11 +37,9 @@ set(SRC
 
     ${Loader}
     ${DECODER}
-    #${IR}
+    ${IR}
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-add_library(Naive+ SHARED ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-target_link_libraries(Naive+ PRIVATE ext_llvm)
-target_compile_definitions(Naive+ PRIVATE NAIVE_EXPORT)
-target_include_directories(Naive+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/Naive+)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm_build/include)
+add_executable(Naive+ ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+target_link_libraries(Naive+ PRIVATE EXT_LLVM)

@@ -3,91 +3,14 @@
 #include "Loader/ImageLoader.h"
 #include <Loader/XEXImage.h>
 #include <Loader/PEImage.h>
-
-//void unitTest(IRGenerator* gen)
-//{
-//    IRFunc* func = gen->getCreateFuncInMap(loadedXex->GetEntryAddress());
-//    func->genBody();
-//    gen->m_builder->SetInsertPoint(func->codeBlocks.at(func->start_address)->bb_Block);
-//
-//    //
-//    // code
-//    //
-//
-//    /*li r4, -1
-//  li r5, 1
-//  divdu r3, r4, r5
-//  blr
-//  #_ REGISTER_OUT r3 0xFFFFFFFFFFFFFFFF
-//  #_ REGISTER_OUT r4 0xFFFFFFFFFFFFFFFF
-//  #_ REGISTER_OUT r5 1*/
-//    
-//
-//    // 0x0000000100000000
-//    BUILD->CreateStore(i64Const(0x8000000000000000), func->getRegister("RR", 4));
-//    //unit_li(func, gen, { 4, 0, (uint32_t)-1, });
-//    unit_li(func, gen, { 5, 0, (uint32_t) - 1,});
-//    unit_divdu(func, gen, { 3, 4, 5, });
-//
-//    unit_bclr(func, gen, {});
-//    
-//
-//    //
-//    // DUMP
-//    //
-//    printf("----IR DUMP----\n\n\n");
-//    gen->writeIRtoFile();
-//}
-//bool pass_Emit()
-//{
-//
-//    //if (isUnitTesting)
-//	//{
-//	//	unitTest(g_irGen);
-//	//	return true;
-//	//}
-//
-//    bool ret = true;
-//
-//    for (size_t i = 0; i < loadedXex->GetNumSections(); i++)
-//    {
-//        const Section* section = loadedXex->GetSection(i);
-//
-//        if (!section->CanExecute())
-//        {
-//            continue;
-//        }
-//        printf("Emitting IR for section %s\n", section->GetName().c_str());
-//        // compute code range
-//        const auto baseAddress = loadedXex->GetBaseAddress();
-//        const auto sectionBaseAddress = baseAddress + section->GetVirtualOffset();
-//        auto endAddress = baseAddress + section->GetVirtualOffset() + section->GetVirtualSize();
-//        auto address = sectionBaseAddress;
-//
-//        
-//        for (const auto& pair : g_irGen->m_function_map) 
-//        {
-//            IRFunc* func = pair.second;
-//            if (!func->emission_done)
-//            {
-//				g_irGen->initFuncBody(func);
-//				ret = func->EmitFunction();
-//                func->emission_done = true;
-//            }
-//        }
-//    }
-//
-//    g_irGen->writeIRtoFile();
-//
-//    return ret;
-//}
-
+#include "IR/IRGen.h"
 
 void PBinaryHandle::RecompileBinary()
 {
-
+    //IRGen gen = IRGen(this->m_binInstr);
 }
 
+// loads in PBinaryHandle instructions and other stuff
 void PBinaryHandle::LoadBinary()
 {
     auto bin = XLoader::ImageLoader::load(this->m_imagePath);
@@ -119,14 +42,14 @@ void PBinaryHandle::LoadBinary()
         }
 
 
-        uint32_t secVirtBase = 0;
-        uint32_t secVirtSize = 0;
-        // relocation for kernel, idk why it's offsetted
-        if (this->m_type == BIN_KERNEL)
-        {
-            secVirtBase = 0x80065c00; // .text real base
-            secVirtSize = 0x10A400; // .text real size
-        }
+        //uint32_t secVirtBase = 0;
+        //uint32_t secVirtSize = 0;
+        //// relocation for kernel, idk why it's offsetted
+        //if (this->m_type == BIN_KERNEL)
+        //{
+        //    secVirtBase = 0x80065c00; // .text real base
+        //    secVirtSize = 0x10A400; // .text real size
+        //}
 
         
 	    LOG_DEBUG("PBinaryHandle::LoadBinary", "Found executable section: %s", sec->getName().c_str());
@@ -151,12 +74,7 @@ void PBinaryHandle::LoadBinary()
             // get and byteswap
             uint32_t data = __bswapd( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
             Instruction instruction = registry.DecodeInstr(data, address);
-            //if (instructionSize == 0)
-            //{
-		    //    LOG_ERROR("PBinaryHandle::LoadBinary", "Failed to decode instruction at %08X", address);
-            //    break;
-            //}
-            //this->m_binInstr.push_back(instruction);
+            this->m_binInstr.try_emplace(address, instruction);
              
             address += 4;
         }

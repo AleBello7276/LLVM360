@@ -20,7 +20,7 @@ void InstructionRegistry::InitialiseOpCodeKey(uint32_t mainOP, uint32_t extMASK)
 void InstructionRegistry::AddDescriptorToKey(uint32_t mainOP, std::string mnemonic, FormType type, uint32_t extOP)
 {
 	auto it = m_mainOPs.find(mainOP);
-	if (it == m_mainOPs.end()) { printf("AddDescriptorToKey, Something is wrong :/, did you registerInstructions for this main Opcode? "); _CrtDbgBreak(); }
+	if (it == m_mainOPs.end()) { printf("AddDescriptorToKey, Something is wrong :/, did you called InitialiseOpCodeKey for this main Opcode? "); _CrtDbgBreak(); }
 	OpcodeKey& key = it->second;
 	uint32_t shift = __builtin_ctz(key.m_extMASK);
 	InstructionDescriptor desc = { mnemonic, type };
@@ -35,6 +35,16 @@ void InstructionRegistry::registerInstructions()
 	// MAIN OP: 0
 	InitialiseOpCodeKey(0, 0);
 	AddDescriptorToKey(0, "PADDING", FormType::FORM_PADDING);
+
+
+	// MAIN OP: 4
+	InitialiseOpCodeKey(4, 0x7FF);
+	AddDescriptorToKey(4, "mtvscr", FormType::FORM_VX, 1604);
+	AddDescriptorToKey(4, "mfvscr", FormType::FORM_VX, 1540);
+	AddDescriptorToKey(4, "stvlxl128", FormType::FORM_VX, 1799);
+	AddDescriptorToKey(4, "stvlxl128", FormType::FORM_VX, 1803);
+	AddDescriptorToKey(4, "stvlxl128", FormType::FORM_VX, 1807);
+
 
 	// MAIN OP: 7
 	InitialiseOpCodeKey(7, 0);
@@ -80,6 +90,7 @@ void InstructionRegistry::registerInstructions()
 	InitialiseOpCodeKey(19, 0x7FE);
 	AddDescriptorToKey(19, "bclrx", FormType::FORM_XL, 16);
 	AddDescriptorToKey(19, "bcctrx", FormType::FORM_XL, 528);
+	AddDescriptorToKey(19, "isync", FormType::FORM_XL, 150);
 
 	// MAIN OP: 20
 	InitialiseOpCodeKey(20, 0);
@@ -141,6 +152,77 @@ void InstructionRegistry::registerInstructions()
 	AddDescriptorToKey(31, "sthx", FormType::FORM_X, 407);
 	AddDescriptorToKey(31, "andx", FormType::FORM_X, 28);
 	AddDescriptorToKey(31, "ldarx", FormType::FORM_X, 84);
+	AddDescriptorToKey(31, "stdcx.", FormType::FORM_X, 214);
+	AddDescriptorToKey(31, "stwx", FormType::FORM_X, 151);
+	AddDescriptorToKey(31, "eieio", FormType::FORM_X, 854);
+	AddDescriptorToKey(31, "lwbrx", FormType::FORM_X, 534);
+	AddDescriptorToKey(31, "stwbrx", FormType::FORM_X, 662);
+	AddDescriptorToKey(31, "subfex", FormType::FORM_XO, 136);
+	AddDescriptorToKey(31, "xorx", FormType::FORM_X, 316);
+	AddDescriptorToKey(31, "divdux", FormType::FORM_XO, 457);
+	AddDescriptorToKey(31, "sradix", FormType::FORM_XS, 826); // shifted extOP
+	AddDescriptorToKey(31, "sradix", FormType::FORM_XS, 827); // shifted extOP
+	AddDescriptorToKey(31, "subfcx", FormType::FORM_XO, 8);
+	AddDescriptorToKey(31, "slwx", FormType::FORM_X, 24);
+	AddDescriptorToKey(31, "extsbx", FormType::FORM_X, 954);
+	AddDescriptorToKey(31, "norx", FormType::FORM_X, 124);
+	AddDescriptorToKey(31, "mulhdux", FormType::FORM_XO, 9);
+	AddDescriptorToKey(31, "mfcr", FormType::FORM_X, 19);
+	AddDescriptorToKey(31, "mfcrf", FormType::FORM_XFX, 144);
+	AddDescriptorToKey(31, "dcbf", FormType::FORM_X, 86);
+	AddDescriptorToKey(31, "icbi", FormType::FORM_X, 982);
+	AddDescriptorToKey(31, "dcbst", FormType::FORM_X, 54);
+	AddDescriptorToKey(31, "mtmsr", FormType::FORM_X, 146);
+	AddDescriptorToKey(31, "stwux", FormType::FORM_X, 183);
+	AddDescriptorToKey(31, "lvxl", FormType::FORM_X, 359);
+	AddDescriptorToKey(31, "stvxl", FormType::FORM_X, 487);
+
+
+
+
+	
+	//int32_t ext21_11 = ibf->GetAt(21, 11);
+	//        switch (ext21_11) {
+	//            // VMX LOADS
+	//        case 12:
+	//            INST("lvsl", b6_5, b11_5, b16_5)
+	//        case 1038:
+	//            INST("lvlx", S, b11_5, b16_5)
+	//        case 1550:
+	//            INST("lvlxl", S, b11_5, b16_5)
+	//        case 1102:
+	//            INST("lvrx", S, b11_5, b16_5)
+	//        case 1614:
+	//            INST("lvrxl", S, b11_5, b16_5)
+	//        case 206:
+	//            INST("lvx", S, b11_5, b16_5)
+	//        case 718:
+	//            INST("lvxl", S, b11_5, b16_5)
+	//        case 76:
+	//            INST("lvsr", S, b11_5, b16_5)
+	//
+	//                // STORE
+	//
+	//        case 270:
+	//            INST("stvebx", b6_5, b11_5, b16_5)
+	//        case 334:
+	//            INST("stvehx", b6_5, b11_5, b16_5)
+	//        case 398:
+	//            INST("stvewx", b6_5, b11_5, b16_5)
+	//        case 1294:
+	//            INST("stvlx", b6_5, b11_5, b16_5)
+	//        case 1806:
+	//            INST("stvlxl", b6_5, b11_5, b16_5)
+	//        case 1358:
+	//            INST("stvrx", b6_5, b11_5, b16_5)
+	//        case 1870:
+	//            INST("stvrxl", b6_5, b11_5, b16_5)
+	//        case 462:
+	//            INST("stvx", b6_5, b11_5, b16_5)
+	//        case 974:
+	//            INST("stvxl", b6_5, b11_5, b16_5)
+	//        }
+
 
 	// MAIN OP: 32
 	InitialiseOpCodeKey(32, 0);
@@ -166,9 +248,21 @@ void InstructionRegistry::registerInstructions()
 	InitialiseOpCodeKey(40, 0);
 	AddDescriptorToKey(40, "lhz", FormType::FORM_D);
 
+	// MAIN OP: 42
+	InitialiseOpCodeKey(42, 0);
+	AddDescriptorToKey(42, "lha", FormType::FORM_D);
+
 	// MAIN OP: 44
 	InitialiseOpCodeKey(44, 0);
 	AddDescriptorToKey(44, "sth", FormType::FORM_D);
+
+	// MAIN OP: 50
+	InitialiseOpCodeKey(50, 0);
+	AddDescriptorToKey(50, "lfd", FormType::FORM_D);
+
+	// MAIN OP: 54
+	InitialiseOpCodeKey(54, 0);
+	AddDescriptorToKey(54, "stfd", FormType::FORM_D);
 
 	// MAIN OP: 58
 	InitialiseOpCodeKey(58, 0x2);
@@ -180,4 +274,11 @@ void InstructionRegistry::registerInstructions()
 	InitialiseOpCodeKey(62, 0x2);
 	AddDescriptorToKey(62, "std", FormType::FORM_DS, 0);
 	AddDescriptorToKey(62, "stdu", FormType::FORM_DS, 1);
+
+	// MAIN OP: 63
+	InitialiseOpCodeKey(63, 0x7FE);
+	AddDescriptorToKey(63, "mtfsfx", FormType::FORM_XFL, 711);
+	AddDescriptorToKey(63, "mffsx", FormType::FORM_X, 583);
+
 }
+

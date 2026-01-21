@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
-
+#include "../Decoder/InstructionRegistry.h"
 
 #ifdef NAIVE_EXPORT
 #define NAIVE_EXPORT __declspec(dllexport)
@@ -10,8 +10,6 @@
 #define NAIVE_EXPORT __declspec(dllimport)
 #endif
 
-
-struct Instruction;
 
 enum BinaryType
 {
@@ -28,7 +26,7 @@ struct PBinaryHandle
 	std::wstring m_imagePath;
 	BinaryType m_type;
 	uint32_t m_ID;
-	//std::vector<Instruction> m_binInstr;
+	std::unordered_map<uint32_t, Instruction> m_binInstr;
 
 	void LoadBinary();
 	void RecompileBinary();

@@ -15,3 +15,5 @@
 /runtime/Runtime/.vs
 /.cache/clangd/index
 /build
+/external/llvm_build/include
+/external/llvm_build/lib
