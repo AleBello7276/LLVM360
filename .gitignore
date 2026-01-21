@@ -13,3 +13,5 @@
 *.exe
 *.dll
 /runtime/Runtime/.vs
+/.cache/clangd/index
+/build
