@@ -3,6 +3,11 @@
 #include <unordered_map>
 #include <string>
 
+#ifdef _WIN32
+#define BREAKPOINT _CrtDbgBreak
+#else
+#define BREAKPOINT __builtin_trap
+#endif
 
 enum FormType 
 { 
@@ -173,12 +178,12 @@ struct InstructionRegistry
 		
 		// get OpcodeKey by main Opcode
 		auto it = m_mainOPs.find(operands.DEF.OPCD);
-		if (it == m_mainOPs.end()) { printf("Instruction::DecodeInstr %s : %d", "MAIN OPCODE HAS NO KEY", operands.DEF.OPCD); _CrtDbgBreak(); }
+		if (it == m_mainOPs.end()) { printf("Instruction::DecodeInstr %s : %d", "MAIN OPCODE HAS NO KEY", operands.DEF.OPCD); BREAKPOINT(); }
 		
 		OpcodeKey& key = it->second;
 		uint32_t extOpcode = (data & key.m_extMASK);
 		auto itDesc = key.m_descriptors.find(extOpcode);
-		if (itDesc == key.m_descriptors.end()) { printf("Instruction::DecodeInstr %s %d", "OpCodeKey HAS NO DESCRIPTOR FOR THIS EXTOP", extOpcode >> (__builtin_ctz(key.m_extMASK))); _CrtDbgBreak(); }
+		if (itDesc == key.m_descriptors.end()) { printf("Instruction::DecodeInstr %s %d", "OpCodeKey HAS NO DESCRIPTOR FOR THIS EXTOP", extOpcode >> (__builtin_ctz(key.m_extMASK))); BREAKPOINT(); }
 		
 		InstructionDescriptor& desc = itDesc->second;
 		instr.address = address;

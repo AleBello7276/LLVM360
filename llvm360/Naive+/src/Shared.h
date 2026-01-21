@@ -10,10 +10,14 @@
 #include <stdio.h>
 #include <sstream>
 #include <iomanip>
+#ifdef _WIN32
 #include <conio.h>
+#include <Windows.h>
+#else
+#include <cstdarg>
+#endif
 #include <chrono>
 #include <functional>
-#include <Windows.h>
 
 
 #include "Decoder/InstructionRegistry.h"

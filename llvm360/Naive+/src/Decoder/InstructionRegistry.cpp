@@ -20,7 +20,7 @@ void InstructionRegistry::InitialiseOpCodeKey(uint32_t mainOP, uint32_t extMASK)
 void InstructionRegistry::AddDescriptorToKey(uint32_t mainOP, std::string mnemonic, FormType type, uint32_t extOP)
 {
 	auto it = m_mainOPs.find(mainOP);
-	if (it == m_mainOPs.end()) { printf("AddDescriptorToKey, Something is wrong :/, did you registerInstructions for this main Opcode? "); _CrtDbgBreak(); }
+	if (it == m_mainOPs.end()) { printf("AddDescriptorToKey, Something is wrong :/, did you registerInstructions for this main Opcode? "); BREAKPOINT(); }
 	OpcodeKey& key = it->second;
 	uint32_t shift = __builtin_ctz(key.m_extMASK);
 	InstructionDescriptor desc = { mnemonic, type };

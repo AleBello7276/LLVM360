@@ -149,7 +149,7 @@ void PBinaryHandle::LoadBinary()
         while (address <= end)
         {
             // get and byteswap
-            uint32_t data = __bswapd( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
+            uint32_t data = __bswap_32( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
             Instruction instruction = registry.DecodeInstr(data, address);
             //if (instructionSize == 0)
             //{

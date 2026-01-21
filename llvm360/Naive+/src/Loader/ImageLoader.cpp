@@ -4,6 +4,10 @@
 #include <fstream>
 #include <memory>
 #include <cstring>
+#ifndef _WIN32
+#include <locale>
+#include <codecvt>
+#endif
 
 namespace XLoader
 {
@@ -47,7 +51,11 @@ namespace XLoader
     // ImageLoader implementation
     std::unique_ptr<IImage> ImageLoader::load(const std::wstring& path) {
         // Open file
+        #ifdef _WIN32
         std::ifstream file(path, std::ios::binary | std::ios::ate);
+        #else
+        std::ifstream file(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path), std::ios::binary | std::ios::ate);
+        #endif
         if (!file.is_open()) {
             printf("Failed to open file\n");
             return nullptr;
@@ -306,7 +314,7 @@ namespace XLoader
             auto& importDir = m_optHeader.dataDirectories[1];
             if (importDir.VirtualAddress != 0 && importDir.Size != 0) {
                 // Would parse import descriptors here
-                printf("Import directory found at RVA 0x%08X\n", importDir.VirtualAddress);
+                printf("Import directory found at RVA 0x%08lX\n", importDir.VirtualAddress);
             }
         }
 

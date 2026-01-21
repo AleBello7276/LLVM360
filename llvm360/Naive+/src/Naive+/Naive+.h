@@ -4,11 +4,13 @@
 #include <stdint.h>
 
 
-#ifdef NAIVE_EXPORT
+//#ifndef NAIVE_EXPORT
+#ifdef _WIN32
 #define NAIVE_EXPORT __declspec(dllexport)
 #else
-#define NAIVE_EXPORT __declspec(dllimport)
+#define NAIVE_EXPORT __attribute__((visibility("default")))
 #endif
+//#endif
 
 
 struct Instruction;

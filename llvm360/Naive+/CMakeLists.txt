@@ -5,7 +5,7 @@ project(Naive+)
 
 set(Loader 
     src/Loader/PEImage.h
-    src/Loader/XexImage.h
+    src/Loader/XEXImage.h
     src/Loader/ImageLoader.cpp
     src/Loader/ImageLoader.h
     src/Loader/table/ImportTable.h

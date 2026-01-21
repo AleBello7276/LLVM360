@@ -1,6 +1,17 @@
 #pragma once
 #include "ImageLoader.h"
+#ifdef _WIN32
 #include <windows.h>
+#else
+typedef unsigned long DWORD;
+typedef struct _IMAGE_DATA_DIRECTORY {
+  DWORD VirtualAddress;
+  DWORD Size;
+} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+#define IMAGE_SCN_MEM_EXECUTE 0x20000000
+#define IMAGE_SCN_MEM_READ  0x40000000
+#define IMAGE_SCN_MEM_WRITE 0x80000000
+#endif
 
 
 

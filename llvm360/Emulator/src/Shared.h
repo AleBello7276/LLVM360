@@ -7,6 +7,5 @@
 
 #include <cstdint>
 #include <cstdio>
-#include <windows.h>
 #include <iostream>
 

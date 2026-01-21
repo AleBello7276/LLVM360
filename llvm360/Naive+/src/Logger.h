@@ -33,10 +33,10 @@ void LOG_PRINT(LogLevel level, const char* name, const char* fmt, ...)
     printf("\033[0m\n");
 }
 
-#define LOG_INFO(name, fmt, ...)    LOG_PRINT(LogLevel::LEVEL_INFO, name, fmt, __VA_ARGS__)
-#define LOG_WARNING(name, fmt, ...) LOG_PRINT(LogLevel::LEVEL_WARNING, name, fmt, __VA_ARGS__)
-#define LOG_ERROR(name, fmt, ...)   LOG_PRINT(LogLevel::LEVEL_ERROR, name, fmt, __VA_ARGS__)
-#define LOG_DEBUG(name, fmt, ...)   LOG_PRINT(LogLevel::LEVEL_DEBUG, name, fmt, __VA_ARGS__)
-#define LOG_FATAL(name, fmt, ...)   LOG_PRINT(LogLevel::LEVEL_FATAL, name, fmt, __VA_ARGS__)
+#define LOG_INFO(name, fmt, args...)    LOG_PRINT(LogLevel::LEVEL_INFO,    name, fmt, ## args)
+#define LOG_WARNING(name, fmt, args...) LOG_PRINT(LogLevel::LEVEL_WARNING, name, fmt, ## args)
+#define LOG_ERROR(name, fmt, args...)   LOG_PRINT(LogLevel::LEVEL_ERROR,   name, fmt, ## args)
+#define LOG_DEBUG(name, fmt, args...)   LOG_PRINT(LogLevel::LEVEL_DEBUG,   name, fmt, ## args)
+#define LOG_FATAL(name, fmt, args...)   LOG_PRINT(LogLevel::LEVEL_FATAL,   name, fmt, ## args)
 
 
