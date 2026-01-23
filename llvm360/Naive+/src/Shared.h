@@ -16,7 +16,6 @@
 #include <Windows.h>
 
 
-#include "Decoder/InstructionRegistry.h"
 
 //#include "IR/IRGenerator.h"
 //#include <IR/Unit/UnitTesting.h>

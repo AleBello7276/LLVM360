@@ -55,29 +55,29 @@ void PBinaryHandle::LoadBinary()
 	    LOG_DEBUG("PBinaryHandle::LoadBinary", "Found executable section: %s", sec->getName().c_str());
         
 
-        uint32_t virtualAddr = sec->getVirtualAddress();
-        uint32_t virtualSize = sec->getVirtualSize();
-
-
-        const auto base = bin->getBaseAddress();
-        const auto start = base + virtualAddr;
-        const auto end = base + virtualAddr + virtualSize;
-        
-       
-
-        const uint8_t* secDataPtr = (const uint8_t*)bin->getMemoryData() + (virtualAddr);
-	    uint32_t address = start;
-
-        InstructionRegistry& registry = g_instrRegistry;
-        while (address <= end)
-        {
-            // get and byteswap
-            uint32_t data = __bswapd( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
-            Instruction instruction = registry.DecodeInstr(data, address);
-            this->m_binInstr.try_emplace(address, instruction);
-             
-            address += 4;
-        }
+        //uint32_t virtualAddr = sec->getVirtualAddress();
+        //uint32_t virtualSize = sec->getVirtualSize();
+        //
+        //
+        //const auto base = bin->getBaseAddress();
+        //const auto start = base + virtualAddr;
+        //const auto end = base + virtualAddr + virtualSize;
+        //
+        //
+        //
+        //const uint8_t* secDataPtr = (const uint8_t*)bin->getMemoryData() + (virtualAddr);
+	    //uint32_t address = start;
+        //
+        //InstructionRegistry& registry = g_instrRegistry;
+        //while (address <= end)
+        //{
+        //    // get and byteswap
+        //    uint32_t data = __bswapd( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
+        //    Instruction instruction = registry.DecodeInstr(data, address);
+        //    this->m_binInstr.try_emplace(address, instruction);
+        //     
+        //    address += 4;
+        //}
     }
 }
 
@@ -111,6 +111,8 @@ PBinaryHandle* TranslateBinary(std::wstring path, bool useCache, bool isKernel)
 	return handle;
 }
 
+#include "Codec/ppc_codec.h"
+
 int main(int argc, char* argv[])
 {
    
@@ -120,9 +122,13 @@ int main(int argc, char* argv[])
     //g_irGen = new IRGenerator(loadedXex, mod, &builder);
     //g_irGen->Initialize();
     
-    
+    // 394a0001
 
-
+    const codec::DecodedInst instObj = codec::PPCCodec::decode(0xffff4A39);
+    codec::PPCInstrType instrType = instObj.mInstTemplate.type();
+    printf("Decoded instruction: %s\n", instObj.mInstTemplate.dump(instObj.mData).c_str());
+    //codec::PPCCodec::decode(0x394a0001);
+    uint32_t encodedAddi = codec::Addi::encode(10, 10, 1);
 
     // Splash texts
     printf("Hello, World!\n");

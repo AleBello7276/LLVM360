@@ -14,9 +14,7 @@ set(Loader
 )
 
 
-set(DECODER
-    src/Decoder/InstructionRegistry.cpp
-    src/Decoder/InstructionRegistry.h
+set(CODEC
 	src/Codec/ppc_codec.h
 )
 
@@ -37,7 +35,7 @@ set(SRC
     src/Naive+/Naive+.h
 
     ${Loader}
-    ${DECODER}
+    ${CODEC}
     ${IR}
 )
 
