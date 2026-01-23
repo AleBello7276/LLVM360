@@ -20,7 +20,6 @@ llvm_map_components_to_libnames(LLVM_COMPONENTS
   IRReader
 
   OrcJIT
-  NativeLLVMConfig
   Passes
 
   TableGen

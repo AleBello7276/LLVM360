@@ -17,11 +17,12 @@ set(Loader
 set(DECODER
     src/Decoder/InstructionRegistry.cpp
     src/Decoder/InstructionRegistry.h
+	src/Codec/ppc_codec.h
 )
 
 set(IR
-    src/IR/IRGen.h
-    src/IR/IRGen.cpp
+    #src/IR/IRGen.h
+    #src/IR/IRGen.cpp
 
     #src/IR/IRFunc.cpp
     #src/IR/IRFunc.h
