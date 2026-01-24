@@ -47,7 +47,7 @@ namespace XLoader
     };
 
     struct PEOptionalHeader32 {
-        uint16_t magic;  // 0x10B for 32-bit
+        uint16_t magic;
         uint8_t majorLinkerVersion;
         uint8_t minorLinkerVersion;
         uint32_t sizeOfCode;

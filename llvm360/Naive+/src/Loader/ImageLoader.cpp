@@ -8,7 +8,6 @@
 namespace XLoader
 {
 
-    // Utility class for reading binary data
     class BinaryReader {
     public:
         BinaryReader(const uint8_t* data, size_t size)
@@ -44,20 +43,16 @@ namespace XLoader
         size_t m_offset;
     };
 
-    // ImageLoader implementation
-    std::unique_ptr<IImage> ImageLoader::load(const std::wstring& path) {
-        // Open file
+    std::unique_ptr<IImage> ImageLoader::load(const std::string& path) {
         std::ifstream file(path, std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
             printf("Failed to open file\n");
             return nullptr;
         }
 
-        // Get file size
         size_t fileSize = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        // Read file data
         std::vector<uint8_t> buffer(fileSize);
         if (!file.read(reinterpret_cast<char*>(buffer.data()), fileSize)) {
             printf("Failed to read file\n");
@@ -122,7 +117,6 @@ namespace XLoader
         return ImageType::Unknown;
     }
 
-    // PE Image implementation
     PEImage::~PEImage() {
         if (m_memoryData) {
             delete[] m_memoryData;
@@ -161,7 +155,6 @@ namespace XLoader
     bool PEImage::loadHeaders(const uint8_t* data, size_t size) {
         BinaryReader reader(data, size);
 
-        // Read DOS header
         if (!reader.read(&m_dosHeader, sizeof(DOSHeader))) {
             return false;
         }
@@ -171,12 +164,10 @@ namespace XLoader
             return false;
         }
 
-        // Move to PE header
         if (!reader.seek(m_dosHeader.newHeaderOffset)) {
             return false;
         }
 
-        // Check PE signature
         uint32_t peSignature;
         if (!reader.read(&peSignature, sizeof(uint32_t))) {
             return false;
@@ -187,12 +178,10 @@ namespace XLoader
             return false;
         }
 
-        // Read COFF header
         if (!reader.read(&m_coffHeader, sizeof(COFFHeader))) {
             return false;
         }
 
-        // Read optional header
         if (m_coffHeader.optionalHeaderSize >= sizeof(PEOptionalHeader32)) {
             if (!reader.read(&m_optHeader, sizeof(PEOptionalHeader32))) {
                 return false;
@@ -213,30 +202,27 @@ namespace XLoader
     bool PEImage::loadSections(const uint8_t* data, size_t size) {
         BinaryReader reader(data, size);
 
-        // Seek to section headers (after optional header)
         size_t sectionOffset = m_dosHeader.newHeaderOffset + 4 + sizeof(COFFHeader) + m_coffHeader.optionalHeaderSize;
         if (!reader.seek(sectionOffset)) {
             return false;
         }
 
-        // Read sections
         for (int i = 0; i < m_coffHeader.numberOfSections; i++) {
             PESectionHeader sectionHeader;
             if (!reader.read(&sectionHeader, sizeof(PESectionHeader))) {
                 return false;
             }
 
-            // Extract section name
             char name[9] = { 0 };
             std::memcpy(name, sectionHeader.name, 8);
 
-            // Determine section flags
             bool readable = (sectionHeader.characteristics & IMAGE_SCN_MEM_READ) != 0;
             bool writable = (sectionHeader.characteristics & IMAGE_SCN_MEM_WRITE) != 0;
             bool executable = (sectionHeader.characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
 
 
             // THIS WONT BE PERMANENT, it's just so i can get things going without wasting time with this
+            // TODO: remove this, i can just load the file directly in memory without parsing sections
             if(strcmp(name,".text") == 0)
             {
                 printf("PEImage::loadSections %s", "WARNING-- USING HARDCODED OFFSET AND SIZE");

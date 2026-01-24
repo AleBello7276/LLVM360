@@ -125,27 +125,24 @@ namespace XLoader
         const std::vector<std::unique_ptr<Import>>& getImports() const override { return m_imports; }
 
     private:
-        // Header loading
+        // header loading
         bool loadHeaders(const uint8_t* data, size_t size);
         bool parseOptionalHeaders(const uint8_t* data, size_t size);
         bool loadLoaderInfo(const uint8_t* data, size_t size);
 
-        // Decompression
+        // decompress
         bool decompressImage(const uint8_t* data, size_t size);
         bool decompressBasic(const uint8_t* data, size_t size);
         bool decompressNormal(const uint8_t* data, size_t size);
 
-        // Decryption
+        // decrypt
         void decryptSessionKey();
         bool decryptData(uint8_t* dest, const uint8_t* src, size_t size);
 
-        // PE extraction
         bool extractPEImage();
-
-        // Import handling
         bool processImports();
 
-        // Utilities
+        // util
         static void swap16(uint16_t* val);
         static void swap32(uint32_t* val);
 

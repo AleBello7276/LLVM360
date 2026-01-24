@@ -32,7 +32,8 @@ set(SRC
     src/LLVM360.cpp
     src/Shared.h
     src/Logger.h 
-    src/Naive+/Naive+.h
+	src/PPCModule.cpp
+	src/PPCModule.h
 
     ${Loader}
     ${CODEC}

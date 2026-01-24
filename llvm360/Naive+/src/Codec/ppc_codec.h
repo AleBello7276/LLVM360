@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <array>
+#include <stdexcept>
 
 /*
     ------ LLVM360 PowerPC Codec ------

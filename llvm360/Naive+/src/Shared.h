@@ -21,8 +21,7 @@
 //#include <IR/Unit/UnitTesting.h>
 //#include <IR/IRFunc.h>
 //
-#include "Naive+/Naive+.h"
-//
+
 //// Naive+ stuff
 //IRGenerator* g_irGen;
 //llvm::LLVMContext cxt;

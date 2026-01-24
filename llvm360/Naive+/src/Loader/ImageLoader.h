@@ -4,11 +4,9 @@
 #include <string>
 #include <cstdint>
 
-// Forward declarations
 class ImageLoader;
 class Section;
 
-// Import types
 enum class ImportType {
     Function,
     Variable
@@ -23,7 +21,6 @@ enum class XboxLibrary {
 
 namespace XLoader {
 
-    // Import information
     struct Import {
         XboxLibrary library;
         ImportType type;
@@ -38,7 +35,7 @@ namespace XLoader {
         }
     };
 
-    // Section information
+
     class Section {
     public:
         Section(const std::string& name, uint32_t vAddr, uint32_t vSize,
@@ -72,7 +69,7 @@ namespace XLoader {
         bool m_executable;
     };
 
-    // Base image interface
+
     class IImage {
     public:
         virtual ~IImage() = default;
@@ -86,17 +83,15 @@ namespace XLoader {
         virtual const std::vector<std::unique_ptr<Import>>& getImports() const = 0;
     };
 
-    // Image types
     enum class ImageType {
         Unknown,
         PE,
         XEX2
     };
 
-    // Main image loader
     class ImageLoader {
     public:
-        static std::unique_ptr<IImage> load(const std::wstring& path);
+        static std::unique_ptr<IImage> load(const std::string& path);
         static std::unique_ptr<IImage> loadFromMemory(const uint8_t* data, size_t size);
 
     private:
