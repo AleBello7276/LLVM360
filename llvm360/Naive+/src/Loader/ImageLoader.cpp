@@ -223,13 +223,13 @@ namespace XLoader
 
             // THIS WONT BE PERMANENT, it's just so i can get things going without wasting time with this
             // TODO: remove this, i can just load the file directly in memory without parsing sections
-            if(strcmp(name,".text") == 0)
-            {
-                printf("PEImage::loadSections %s", "WARNING-- USING HARDCODED OFFSET AND SIZE");
-                sectionHeader.pointerToRawData = sectionHeader.virtualAddress;
-                sectionHeader.sizeOfRawData = 0xFDE4c;
-                sectionHeader.virtualSize = 0xFDE4c;
-            }
+            //if(strcmp(name,".text") == 0)
+            //{
+            //    printf("PEImage::loadSections %s", "WARNING-- USING HARDCODED OFFSET AND SIZE");
+            //    sectionHeader.pointerToRawData = sectionHeader.virtualAddress;
+            //    sectionHeader.sizeOfRawData = 0xFDE4c;
+            //    sectionHeader.virtualSize = 0xFDE4c;
+            //}
             auto section = std::make_unique<Section>(
                 name,
                 sectionHeader.virtualAddress,

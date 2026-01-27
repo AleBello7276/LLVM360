@@ -1,4 +1,3 @@
-#include "Shared.h"
 #include "Logger.h"
 #include "Loader/ImageLoader.h"
 #include <Loader/XEXImage.h>
@@ -6,6 +5,20 @@
 #include "IR/IRGen.h"
 #include "Codec/ppc_codec.h"
 #include "PPCModule.h"
+
+//#include "IR/IRGenerator.h"
+//#include <IR/Unit/UnitTesting.h>
+//#include <IR/IRFunc.h>
+//
+
+//// Naive+ stuff
+//IRGenerator* g_irGen;
+//llvm::LLVMContext cxt;
+//llvm::Module* mod = new llvm::Module("Xenon", cxt);
+//llvm::IRBuilder<llvm::NoFolder> builder(cxt);
+//
+
+
 
 int main(int argc, char* argv[]) {
    

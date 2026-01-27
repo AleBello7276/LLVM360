@@ -1,12 +1,9 @@
 #include "PPCModule.h"
 
 #include "Logger.h"
-#include "Loader/ImageLoader.h"
-#include <Loader/XEXImage.h>
-#include <Loader/PEImage.h>
 
 PPCModule::PPCModule(std::string path, bool useCache, bool isKernel) {
-    mImagePath = path;
+    mPath = path;
     m_type = isKernel ? BIN_KERNEL : BIN_UNKNOWN;
     mID = -1;
 
@@ -27,16 +24,16 @@ PPCModule::PPCModule(std::string path, bool useCache, bool isKernel) {
 }
 
 void PPCModule::LoadBinary() {
-    auto bin = XLoader::ImageLoader::load(mImagePath);
-    if(bin == nullptr) {
+    mImage = XLoader::ImageLoader::load(mPath);
+    if(mImage == nullptr) {
         LOG_ERROR("PBinaryHandle::LoadBinary -> Failed to load binary image");
         return;
     }
     if(m_type == BIN_UNKNOWN) {
-        if(dynamic_cast<XLoader::XEXImage*>(bin.get()) != nullptr) {
+        if(dynamic_cast<XLoader::XEXImage*>(mImage.get()) != nullptr) {
             m_type = BIN_XEX;
         }
-        else if(dynamic_cast<XLoader::PEImage*>(bin.get()) != nullptr) {
+        else if(dynamic_cast<XLoader::PEImage*>(mImage.get()) != nullptr) {
             m_type = BIN_PE;
         }
         else {
@@ -46,52 +43,60 @@ void PPCModule::LoadBinary() {
     }
 
 
-    for(const auto& sec : bin->getSections()) {
+    DiscoverInstructions();
+}
+
+void PPCModule::RecompileBinary() {
+
+}
+
+void PPCModule::DiscoverInstructions() {
+    const uint32_t entryPoint = mImage->getEntryPoint();
+    const uint32_t imageBase = mImage->getBaseAddress();
+    const uint8_t* mData = mImage->getMemoryData();
+
+    uint32_t test = mData[entryPoint - imageBase];
+    LOG_INFO("PPCModule::DiscoverInstructions Entry point at 0x{:08X}, first byte: 0x{:02X}", entryPoint, test);
+
+    for(const auto& sec : mImage->getSections()) {
 
         if(sec->getName() != ".text") {
             continue;
         }
 
-
-        //uint32_t secVirtBase = 0;
-        //uint32_t secVirtSize = 0;
-        //// relocation for kernel, idk why it's offsetted
-        //if (this->m_type == BIN_KERNEL)
-        //{
-        //    secVirtBase = 0x80065c00; // .text real base
-        //    secVirtSize = 0x10A400; // .text real size
-        //}
+        uint32_t secVirtBase = 0;
+        uint32_t secVirtSize = 0;
+        
+        // relocation for kernel, i hate this.
+        if (this->m_type == BIN_KERNEL)
+        {
+            secVirtBase = 0x80065c00;   // .text real base
+            secVirtSize = 0x10A400;     // .text real size
+        }
 
 
         LOG_DEBUG("PBinaryHandle::LoadBinary Found executable section: {}", sec->getName().c_str());
 
 
-        //uint32_t virtualAddr = sec->getVirtualAddress();
-        //uint32_t virtualSize = sec->getVirtualSize();
-        //
-        //
-        //const auto base = bin->getBaseAddress();
-        //const auto start = base + virtualAddr;
-        //const auto end = base + virtualAddr + virtualSize;
-        //
-        //
-        //
-        //const uint8_t* secDataPtr = (const uint8_t*)bin->getMemoryData() + (virtualAddr);
-        //uint32_t address = start;
-        //
-        //InstructionRegistry& registry = g_instrRegistry;
-        //while (address <= end)
-        //{
-        //    // get and byteswap
-        //    uint32_t data = __bswapd( (uint32_t) * (uint32_t*)(secDataPtr + (address - start)) );
-        //    Instruction instruction = registry.DecodeInstr(data, address);
-        //    this->m_binInstr.try_emplace(address, instruction);
-        //     
-        //    address += 4;
-        //}
+        uint32_t virtualAddr = sec->getVirtualAddress();
+        uint32_t virtualSize = sec->getVirtualSize();
+        
+        
+        const auto base = mImage->getBaseAddress();
+        const auto start = base + virtualAddr;
+        const auto end = base + virtualAddr + virtualSize;
+        
+        
+        
+        const uint8_t* secDataPtr = (const uint8_t*)mImage->getMemoryData() + (virtualAddr);
+        uint32_t address = start;
+
+        while (address <= end) {
+            // get and byteswap
+            uint32_t data = (uint32_t) * (uint32_t*)(secDataPtr + (address - start));
+            mInstrMap.try_emplace(address, codec::PPCCodec::decode(data));
+             
+            address += 4;
+        }
     }
-}
-
-void PPCModule::RecompileBinary() {
-
 }

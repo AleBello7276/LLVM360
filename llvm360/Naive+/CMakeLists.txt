@@ -28,9 +28,14 @@ set(IR
     #src/IR/IRGenerator.h
 )
 
+set(VM
+	src/VM/RuntimeVM.cpp
+	src/VM/RuntimeVM.h
+	src/VM/PPCContext.h
+)
+
 set(SRC
     src/LLVM360.cpp
-    src/Shared.h
     src/Logger.h 
 	src/PPCModule.cpp
 	src/PPCModule.h
@@ -38,6 +43,7 @@ set(SRC
     ${Loader}
     ${CODEC}
     ${IR}
+	${VM}
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm_build/include)

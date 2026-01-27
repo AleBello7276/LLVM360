@@ -3,6 +3,7 @@
 #include <string>
 #include <array>
 #include <stdexcept>
+#include <format>
 
 /*
     ------ LLVM360 PowerPC Codec ------
@@ -19,6 +20,7 @@ namespace codec {
 
     enum PPCInstrType {
         I_Undefined,
+        I_PADDING,
         I_ADDI,
 
         ENUM_COUNT
@@ -56,7 +58,6 @@ namespace codec {
     };
     
     
-    template<typename spec>
     struct Encoder {
     private:
         uint32_t word = 0;
@@ -134,7 +135,7 @@ namespace codec {
             return "addi " + gprString(RT::extract(data)) + ", " + gprString(RA::extract(data)) + ", " + simmString(SIMM::extract(data));
         }
         static uint32_t encode(GPRReg rt, GPRReg ra, SIMMVal simm) {
-            Encoder<Addi> encoder;
+            Encoder encoder;
             encoder
                 .set<OPCD>(14) // ADDI opcode
                 .set<RT>(rt)
@@ -146,6 +147,21 @@ namespace codec {
         const PPCInstrType mType = PPCInstrType::I_ADDI;
     };
     REGISTER_INSTR(Addi)
+
+    struct Padding : PPCInstruction {
+        Padding() : PPCInstruction() {}
+        PPCInstrType type() const override { return mType; }
+        std::string dump(uint32_t data) const override {
+            return "PADDING";
+        }
+        static uint32_t encode() {
+            Encoder encoder; encoder.set<OPCD>(0); // PADDING
+            return encoder.value();
+        }
+        private:
+            const PPCInstrType mType = PPCInstrType::I_PADDING;
+    };
+    REGISTER_INSTR(Padding)
 
 
 
@@ -181,8 +197,14 @@ namespace codec {
 
             uint32_t mainOP = OPCD::extract(data);
             switch(mainOP) {
+            case 0: // Padding
+                return { gPadding, data };
             case 14: // ADDI
                 return { gAddi, data };
+
+            default:
+                throw std::out_of_range(std::format("PPCCodec::decode -> Unknown main opcode: 0x{:02X}", mainOP));
+                return { gUndefinedInst, data };
             }
 
             return { gUndefinedInst, data };

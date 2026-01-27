@@ -64,4 +64,4 @@ private:
 #define LOG_INFO(...)  Logger::log<LogLevel::Info>(__VA_ARGS__)
 #define LOG_WARN(...)  Logger::log<LogLevel::Warn>(__VA_ARGS__)
 #define LOG_ERROR(...) Logger::log<LogLevel::Error>(__VA_ARGS__)
-#define LOG_Fatal(...) Logger::log<LogLevel::Fatal>(__VA_ARGS__)
+#define LOG_FATAL(...) Logger::log<LogLevel::Fatal>(__VA_ARGS__)
